@@ -76,13 +76,14 @@ class DisplayCompetition(object):
                 #print maxSizeRoundFiles
                 maxSizeRoundFile = sorted(maxSizeRoundFiles)[-1]
                 self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
+            print self.leaguesMaps
         print len(self.leaguesMaps)
 
     def displayLeagues(self):
         #roundDisplayParser = RoundDisplayHTMLParser()
         #roundDisplayParser.feed()
 
-        for x in range(4):
+        for x in range(6):
             htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
             fileContents = """
 <html>
@@ -93,14 +94,34 @@ class DisplayCompetition(object):
   </head>
   <body>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 2] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 3] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 30] + """' height=1000 width=900 frameborder=0></iframe>
   </body>
 </html>
 """
             htmlLeagueDisplayFile.write(fileContents)
             htmlLeagueDisplayFile.close()
+
+        for x in range(6,9):
+            htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
+            fileContents = """
+<html>
+  <head>
+    <title>
+      PlanetWars Tournament
+    </title>
+  </head>
+  <body>
+    <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
+  </body>
+</html>
+"""
+            htmlLeagueDisplayFile.write(fileContents)
+            htmlLeagueDisplayFile.close()
+
 
 
                 #maxSizeRoundPath = os.path.dirname(os.path.realpath(__file__)) + '/' + matchDir + '/' + maxSizeRoundFile +  '/generated.htm'
