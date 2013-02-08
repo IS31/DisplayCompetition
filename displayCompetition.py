@@ -1,6 +1,12 @@
 import os
 import webbrowser
 from HTMLParser import HTMLParser
+from random import randint
+
+def listdir_nohidden(path):
+    for f in os.listdir(path):
+        if not f.startswith('.'):
+            yield f
 
 class RoundDisplayHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
@@ -36,6 +42,9 @@ class DisplayCompetition(object):
     finalPlayers = []
     scores = {}
     finalScores = {}
+
+    drawFlag = False
+    drawMaps = []
     
     def __init__(self):
         self.initPlayers2Bots()
@@ -60,26 +69,24 @@ class DisplayCompetition(object):
         self.generateChampionDisplay()
 
     def initPlayers2Bots(self):
-        for d in os.listdir(self.submissionsDir):
+        for d in listdir_nohidden(self.submissionsDir):
             f = open(self.submissionsDir + d + '/bot.txt', 'r')
             self.players2Bots[d] = f.readline()
 
     def doLeagues(self):
         for league in range(1, self.numberOfLeagues + 1):
             leaguePlayers = set()
-            for match in os.listdir(self.leaguesDir + str(league)):
+            for match in listdir_nohidden(self.leaguesDir + str(league)):
                 leaguePlayers.add(match.split('-')[0])
-                print leaguePlayers
                 leaguePlayers.add(match.split('-')[1])
-                print "Entering match {}".format(match)
                 matchDir = self.leaguesDir + str(league) + '/' + match
                 matchWinner = self.getMatchWinner(matchDir)
                 maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
                 self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
             self.leaguesPlayers.append(list(leaguePlayers))
-            print self.leaguesMaps
-        print len(self.leaguesMaps)
-        print self.leaguesPlayers
+            #print self.leaguesMaps
+        #print len(self.leaguesMaps)
+        #print self.leaguesPlayers
 
     def initScoreRounds(self):
         for league in self.leaguesPlayers:
@@ -96,9 +103,9 @@ class DisplayCompetition(object):
         playerAWins = 0
         playerB = match.split('-')[1]
         playerBWins = 0
-        if 'draw' in os.listdir(matchDir):
+        if 'draw' in listdir_nohidden(matchDir):
             matchDir = matchDir + '/draw/'
-        for rnd in os.listdir(matchDir):
+        for rnd in listdir_nohidden(matchDir):
             if rnd.split('.')[-1] != "txt":
                 continue
             winner = rnd.split('_')[0][1:]
@@ -106,34 +113,37 @@ class DisplayCompetition(object):
                 playerAWins += 1
             elif winner == playerB:
                 playerBWins += 1
-            else:
+            elif winner == '0':
                 playerAWins += 1
                 playerBWins += 1
-            matchWinner = ''
-            matchLooser = ''
-            if playerAWins > playerBWins:
-                matchWinner = playerA
-                matchLooser = playerB
-            elif playerBWins > playerAWins:
-                matchWinner = playerB
-                matchLooser = playerA
             else:
-                #print "Draw game!"
-                matchWinner = playerA
-                matchLooser = playerB
-        print "Group {} wins against group {}".format(matchWinner, matchLooser)
+                print "ERROR SOLVING MATCH"
+        matchWinner = ''
+        matchLooser = ''
+        if playerAWins > playerBWins:
+            matchWinner = playerA
+            matchLooser = playerB
+        elif playerBWins > playerAWins:
+            matchWinner = playerB
+            matchLooser = playerA
+        else:
+            print "Draw game!"
+            print matchDir
+            matchWinner = playerA
+            matchLooser = playerB
+            self.drawFlag = True
+        #print "Group {} wins against group {}".format(matchWinner, matchLooser)
         return matchWinner
 
     def getMapToDisplay(self, matchDir, matchWinner):
-        wonRoundFiles = [rnd for rnd in os.listdir(matchDir) if rnd.split('_')[0] == 'w' + matchWinner and rnd.split('.')[-1] != 'txt']
-        maxSizeRoundFiles = [f for f in wonRoundFiles if f.endswith('map5')]
-        if len(maxSizeRoundFiles) == 0:
-            maxSizeRoundFiles = [f for f in wonRoundFiles if f.endswith('map4')]
-        if len(maxSizeRoundFiles) == 0:
-            maxSizeRoundFiles = [f for f in wonRoundFiles if f.endswith('map3')]
-        if len(maxSizeRoundFiles) == 0:
-            maxSizeRoundFiles = [f for f in wonRoundFiles if f.endswith('map2')]
-        return sorted(maxSizeRoundFiles)[-1]
+        wonRoundFiles = [rnd for rnd in listdir_nohidden(matchDir) if rnd.split('_')[0] == 'w' + matchWinner and rnd.split('.')[-1] != 'txt']
+        selectedMap = wonRoundFiles[randint(0,len(wonRoundFiles)-1)]
+        if self.drawFlag:
+            self.drawMaps.append(selectedMap)
+            self.drawFlag = False
+            print "FOOOOOOOOOOOOOOOO"
+            print self.drawMaps
+        return selectedMap
 
     def resetScores(self):
         for x,y in self.scores.iteritems():
@@ -154,13 +164,7 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='"""
-            if x < 8:
-                fileContents += """resultsDisplay""" + str(x) + """.html"""
-            else:
-                fileContents += """quarterFinalsDisplayCover.html"""
-            fileContents += """
-'>Next</a></div><hr>
+    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsDisplay""" + str(x) + """.html'>Next</a></div><hr>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
@@ -176,12 +180,41 @@ class DisplayCompetition(object):
             htmlLeagueDisplayFile.write(fileContents)
             htmlLeagueDisplayFile.close()
             
-            self.scores[self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]] += 3
-            self.scores[self.leaguesMaps[x+10].split('/')[-2].split('_')[0][1:]] += 3
-            self.scores[self.leaguesMaps[x+20].split('/')[-2].split('_')[0][1:]] += 3
+            winner1 = self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]
+            winner2 = self.leaguesMaps[x+10].split('/')[-2].split('_')[0][1:]
+            winner3 = self.leaguesMaps[x+20].split('/')[-2].split('_')[0][1:]
             if x < 6:
-                self.scores[self.leaguesMaps[x+30].split('/')[-2].split('_')[0][1:]] += 3
-
+                winner4 = self.leaguesMaps[x+30].split('/')[-2].split('_')[0][1:]
+            for draws in self.drawMaps:
+                if draws not in self.leaguesMaps[x]:
+                    self.scores[winner1] += 3
+                else:
+                    onePlayer = self.leaguesMaps[x].split('/')[-2].split('_')[1].split('-')[0]
+                    otherPlayer = self.leaguesMaps[x].split('/')[-2].split('_')[1].split('-')[1]
+                    self.scores[onePlayer] += 1
+                    self.scores[otherPlayer] += 1
+                if draws not in self.leaguesMaps[x+10]:
+                    self.scores[winner2] += 3
+                else:
+                    onePlayer = self.leaguesMaps[x+10].split('/')[-2].split('_')[1].split('-')[0]
+                    otherPlayer = self.leaguesMaps[x+10].split('/')[-2].split('_')[1].split('-')[1]
+                    self.scores[onePlayer] += 1
+                    self.scores[otherPlayer] += 1
+                if draws not in self.leaguesMaps[x+20]:
+                    self.scores[winner3] += 3
+                else:
+                    onePlayer = self.leaguesMaps[x+20].split('/')[-2].split('_')[1].split('-')[0]
+                    otherPlayer = self.leaguesMaps[x+20].split('/')[-2].split('_')[1].split('-')[1]
+                    self.scores[onePlayer] += 1
+                    self.scores[otherPlayer] += 1
+                if x < 6:
+                    if draws not in self.leaguesMaps[x+30]:
+                        self.scores[winner4] += 3
+                    else:
+                        onePlayer = self.leaguesMaps[x+30].split('/')[-2].split('_')[1].split('-')[0]
+                        otherPlayer = self.leaguesMaps[x+30].split('/')[-2].split('_')[1].split('-')[1]
+                        self.scores[onePlayer] += 1
+                        self.scores[otherPlayer] += 1
             htmlResultsDisplayFile = open('resultsDisplay' + str(x) + '.html', 'w')
             fileContents = """
 <html>
@@ -192,7 +225,13 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='leagueDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
+    <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='"""
+            if x < 8:
+                fileContents += """leagueDisplay""" + str(x + 1) + """.html"""
+            else:
+                fileContents += """quarterFinalsDisplayCover.html"""
+            fileContents += """
+'>Next</a></div><hr>
     <div align='center' style='width:900px; margin:20px auto;'>
     <div style='float:center'>
 """
@@ -219,9 +258,6 @@ class DisplayCompetition(object):
 """
             htmlResultsDisplayFile.write(fileContents)
             htmlResultsDisplayFile.close()
-
-                #maxSizeRoundPath = os.path.dirname(os.path.realpath(__file__)) + '/' + matchDir + '/' + maxSizeRoundFile +  '/generated.htm'
-                #webbrowser.open("file://" + maxSizeRoundPath)
 
     def generateLeaguesCover(self):
         htmlCoverPage = open('leagueDisplayCover.html', 'w')
@@ -261,7 +297,7 @@ class DisplayCompetition(object):
 
     def doQuarterFinals(self):
         print "Doing quarter finals"
-        for match in os.listdir(self.quarterFinalsDir):
+        for match in listdir_nohidden(self.quarterFinalsDir):
             quarterPlayers = set()
             quarterPlayers.add(match.split('-')[0])
             quarterPlayers.add(match.split('-')[1])
@@ -270,11 +306,11 @@ class DisplayCompetition(object):
             self.quarterFinalsWinners.append(matchWinner)
             #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
             quarterMaps = []
-            for rnd in os.listdir(self.quarterFinalsDir + match):
+            for rnd in listdir_nohidden(self.quarterFinalsDir + match):
                 if not rnd.endswith('.txt') and rnd != 'draw':
                     quarterMaps.append(matchDir + '/' + rnd + '/generated.htm')
                 if rnd == 'draw':
-                    for rnd2 in os.listdir(self.quarterFinalsDir + match + '/' + rnd):
+                    for rnd2 in listdir_nohidden(self.quarterFinalsDir + match + '/' + rnd):
                         if not rnd2.endswith('.txt'):
                             quarterMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
             self.quarterFinalsMaps.append(quarterMaps)
@@ -407,7 +443,7 @@ class DisplayCompetition(object):
 
     def doSemiFinals(self):
         print "Doing semi finals"
-        for match in os.listdir(self.semiFinalsDir):
+        for match in listdir_nohidden(self.semiFinalsDir):
             semiPlayers = set()
             semiPlayers.add(match.split('-')[0])
             semiPlayers.add(match.split('-')[1])
@@ -416,11 +452,11 @@ class DisplayCompetition(object):
             self.semiFinalsWinners.append(matchWinner)
             #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
             semiMaps = []
-            for rnd in os.listdir(self.semiFinalsDir + match):
+            for rnd in listdir_nohidden(self.semiFinalsDir + match):
                 if not rnd.endswith('.txt') and rnd != 'draw':
                     semiMaps.append(matchDir + '/' + rnd + '/generated.htm')
                 if rnd == 'draw':
-                    for rnd2 in os.listdir(self.semiFinalsDir + match + '/' + rnd):
+                    for rnd2 in listdir_nohidden(self.semiFinalsDir + match + '/' + rnd):
                         if not rnd2.endswith('.txt'):
                             semiMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
             self.semiFinalsMaps.append(semiMaps)
@@ -432,15 +468,12 @@ class DisplayCompetition(object):
         print "Generating semi finals display"
         indexPager = 0
         for smap in self.semiFinalsMaps:
-            print self.semiFinalsMaps
             rnds = []
             if len(smap) == 8:
                 rnds = [0,4]
             else:
                 rnds = [0,4,8]
             for x in rnds:
-                print smap
-                print x
                 htmlSemiFinalsDisplay = open('semiFinalsDisplay' + str(indexPager)  + '.html', 'w')
                 fileContents = """
 <html>
@@ -553,11 +586,11 @@ class DisplayCompetition(object):
 
     def doFinal(self):
         print "Doing final"
-        for match in os.listdir(self.finalDir):
+        for match in listdir_nohidden(self.finalDir):
             matchDir = self.finalDir + match
             self.finalPlayers.append(match.split('-')[0])
             self.finalPlayers.append(match.split('-')[1])
-            for rnd in os.listdir(matchDir):
+            for rnd in listdir_nohidden(matchDir):
                 if not rnd.endswith('.txt'):
                     self.finalMaps.append(matchDir + '/' + rnd +  '/generated.htm')
         print self.finalMaps
