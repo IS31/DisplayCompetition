@@ -151,6 +151,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='"""
@@ -188,6 +189,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='leagueDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
@@ -229,6 +231,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='leagueDisplay0.html'>Next</a><hr>
@@ -298,6 +301,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='quarterFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
@@ -331,6 +335,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplayCover.html'>Next</a><hr>
@@ -371,6 +376,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='quarterFinalsDisplay0.html'>Next</a><hr>
@@ -442,6 +448,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='semiFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
@@ -475,6 +482,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='finalDisplayCover.html'>Next</a><hr>
@@ -513,6 +521,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplay0.html'>Next</a><hr>
@@ -563,6 +572,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='resultsFinalDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsFinalDisplay""" + str(x) + """.html'>Next</a></div><hr>
@@ -583,6 +593,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='finalDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='finalDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
@@ -609,6 +620,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='left'><a href='finalDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='championDisplay.html'>Next</a></div><hr>
@@ -643,6 +655,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div align='center'><a href='finalDisplay0.html'>Next</a></div><hr>
@@ -677,6 +690,7 @@ class DisplayCompetition(object):
     <title>
       PlanetWars Tournament
     </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <h1>PlanetWars Champion!</h1>
