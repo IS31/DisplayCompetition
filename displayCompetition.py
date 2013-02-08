@@ -30,7 +30,9 @@ class DisplayCompetition(object):
 
     leaguesPlayers = []
     quarterFinalsPlayers = []
+    quarterFinalsWinners = []
     semiFinalsPlayers = []
+    semiFinalsWinners = []
     finalPlayers = []
     scores = {}
     finalScores = {}
@@ -40,14 +42,17 @@ class DisplayCompetition(object):
         
         self.doLeagues()
         self.initScoreRounds()
-        self.generateCover()
+        self.generateLeaguesCover()
         self.generateLeaguesDisplay()
+        self.resetScores()
         self.doQuarterFinals()
         self.generateQuarterFinalsCover()
         self.generateQuarterFinalsDisplay()
+        self.resetScores()
         self.doSemiFinals()
         self.generateSemiFinalsCover()
         self.generateSemiFinalsDisplay()
+        self.resetScores()
         self.doFinal()
         self.initScoreFinal()
         self.generateFinalCover()
@@ -64,6 +69,7 @@ class DisplayCompetition(object):
             leaguePlayers = set()
             for match in os.listdir(self.leaguesDir + str(league)):
                 leaguePlayers.add(match.split('-')[0])
+                print leaguePlayers
                 leaguePlayers.add(match.split('-')[1])
                 print "Entering match {}".format(match)
                 matchDir = self.leaguesDir + str(league) + '/' + match
@@ -129,11 +135,15 @@ class DisplayCompetition(object):
             maxSizeRoundFiles = [f for f in wonRoundFiles if f.endswith('map2')]
         return sorted(maxSizeRoundFiles)[-1]
 
+    def resetScores(self):
+        for x,y in self.scores.iteritems():
+            self.scores[x] = 0
+
     def generateLeaguesDisplay(self):
         #roundDisplayParser = RoundDisplayHTMLParser()
         #roundDisplayParser.feed()
 
-        for x in range(6):
+        for x in range(9):
             htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
             fileContents = """
 <html>
@@ -143,11 +153,22 @@ class DisplayCompetition(object):
     </title>
   </head>
   <body>
-    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsDisplay""" + str(x) + """.html'>Next</a></div><hr>
+    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='"""
+            if x < 8:
+                fileContents += """resultsDisplay""" + str(x) + """.html"""
+            else:
+                fileContents += """quarterFinalsDisplayCover.html"""
+            fileContents += """
+'>Next</a></div><hr>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+            if x < 6:
+                fileContents += """
     <iframe src='""" + self.leaguesMaps[x + 30] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+            fileContents += """
   </body>
 </html>
 """
@@ -157,7 +178,8 @@ class DisplayCompetition(object):
             self.scores[self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]] += 3
             self.scores[self.leaguesMaps[x+10].split('/')[-2].split('_')[0][1:]] += 3
             self.scores[self.leaguesMaps[x+20].split('/')[-2].split('_')[0][1:]] += 3
-            self.scores[self.leaguesMaps[x+30].split('/')[-2].split('_')[0][1:]] += 3
+            if x < 6:
+                self.scores[self.leaguesMaps[x+30].split('/')[-2].split('_')[0][1:]] += 3
 
             htmlResultsDisplayFile = open('resultsDisplay' + str(x) + '.html', 'w')
             fileContents = """
@@ -170,295 +192,36 @@ class DisplayCompetition(object):
   <body>
     <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='leagueDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
     <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][4]]) + """</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][4]]) + """</td>
-      </tr>
-    </table>
+    <div style='float:center'>
+"""
 
-    </div>
-    <div style='float:right'>
+            for league in self.leaguesPlayers:
+                fileContents += """
     <table border=1>
+""" 
+                for player in league:
+                    fileContents += """
       <tr>
-        <td>""" + self.leaguesPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][0]]) + """</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][4]]) + """</td>
-      </tr>
+"""
+                fileContents += """
     </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][3]]) + """</td>
-      </tr>
-    </table>
-
+"""
+            fileContents += """
     </div>
     </div>
 
   </body>
 </html>
 """
-            htmlResultsDisplayFile.write(fileContents)
-            htmlResultsDisplayFile.close()
-
-
-
-        for x in range(6,9):
-            htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
-            fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsDisplay""" + str(x) + """.html'>Next</a></div><hr>
-    <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
-  </body>
-</html>
-"""
-            htmlLeagueDisplayFile.write(fileContents)
-            htmlLeagueDisplayFile.close()
-
-            self.scores[self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]] += 3
-            self.scores[self.leaguesMaps[x+10].split('/')[-2].split('_')[0][1:]] += 3
-            self.scores[self.leaguesMaps[x+20].split('/')[-2].split('_')[0][1:]] += 3
-
-            htmlResultsDisplayFile = open('resultsDisplay' + str(x) + '.html', 'w')
-            if x < 8:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='leagueDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][4]]) + """</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][4]]) + """</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][4]]) + """</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][3]]) + """</td>
-      </tr>
-    </table>
-
-    </div>
-    </div>
-
-
-  </body>
-</html>
-"""
-            else:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='quarterFinalsDisplayCover.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[0][4]]) + """</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[1][4]]) + """</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][3]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][4]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[2][4]]) + """</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][0]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][1]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][2]]) + """</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>""" + str(self.scores[self.leaguesPlayers[3][3]]) + """</td>
-      </tr>
-    </table>
-    </div>
-    </div>
-
-  </body>
-</html>
-"""
-
-
             htmlResultsDisplayFile.write(fileContents)
             htmlResultsDisplayFile.close()
 
                 #maxSizeRoundPath = os.path.dirname(os.path.realpath(__file__)) + '/' + matchDir + '/' + maxSizeRoundFile +  '/generated.htm'
                 #webbrowser.open("file://" + maxSizeRoundPath)
 
-    def generateCover(self):
+    def generateLeaguesCover(self):
         htmlCoverPage = open('leagueDisplayCover.html', 'w')
         fileContents = """
 <html>
@@ -469,76 +232,22 @@ class DisplayCompetition(object):
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='leagueDisplay0.html'>Next</a><hr>
-    <div style='float:left'>
+    <div style='float:center'>
+"""
+        for league in self.leaguesPlayers:
+            fileContents += """
     <table border=1>
+""" 
+            for player in league:
+                fileContents += """
       <tr>
-        <td>""" + self.leaguesPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][0]]  + """</td><td>0</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][2]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][3]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[0][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[0][4]]  + """</td><td>0</td>
-      </tr>
+"""
+            fileContents += """
     </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][2]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][3]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[1][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[1][4]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[2][4]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][4]]  + """</td><td>0</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][1]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][2]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][2]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.leaguesPlayers[3][3]  + """</td><td>""" + self.players2Bots['group' + self.leaguesPlayers[2][3]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
+"""
+        fileContents += """
     </div>
     </div>
   </body>
@@ -555,16 +264,67 @@ class DisplayCompetition(object):
             quarterPlayers.add(match.split('-')[1])
             matchDir = self.quarterFinalsDir + match
             matchWinner = self.getMatchWinner(matchDir)
-            maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
-            self.quarterFinalsMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
+            self.quarterFinalsWinners.append(matchWinner)
+            #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
+            quarterMaps = []
+            for rnd in os.listdir(self.quarterFinalsDir + match):
+                if not rnd.endswith('.txt') and rnd != 'draw':
+                    quarterMaps.append(matchDir + '/' + rnd + '/generated.htm')
+                if rnd == 'draw':
+                    for rnd2 in os.listdir(self.quarterFinalsDir + match + '/' + rnd):
+                        if not rnd2.endswith('.txt'):
+                            quarterMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
+            self.quarterFinalsMaps.append(quarterMaps)
             self.quarterFinalsPlayers.append(list(quarterPlayers))
         print self.quarterFinalsPlayers
         print self.quarterFinalsMaps
 
     def generateQuarterFinalsDisplay(self):
         print "Generating quarter finals display"
-        for x in range(4):
-            htmlQuarterFinalsDisplay = open('quarterFinalsDisplay' + str(x) + '.html', 'w')
+        indexPager = 0
+        for qmap in self.quarterFinalsMaps:
+            rnds = []
+            if len(qmap) == 8:
+                rnds = [0,4]
+            else:
+                rnds = [0,4,8]
+            for x in rnds:
+                #print qmap
+                #print x
+                htmlQuarterFinalsDisplay = open('quarterFinalsDisplay' + str(indexPager)  + '.html', 'w')
+                fileContents = """
+<html>
+  <head>
+    <title>
+      PlanetWars Tournament
+    </title>
+  </head>
+  <body>
+    <div align='left'><a href='quarterFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
+                if indexPager > 8:
+                    fileContents += """'resultsQuarterFinalsDisplay.html'"""
+                else:
+                    fileContents += """'quarterFinalsDisplay""" + str(indexPager + 1) + """.html'"""
+                fileContents += """>Next</a></div><hr>
+    <iframe src='""" + qmap[x] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + qmap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+                if len(qmap) != 10 or x != 8:
+                    fileContents += """
+    <iframe src='""" + qmap[x + 2] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + qmap[x + 3] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+                fileContents += """
+  </body>
+</html>
+"""
+    
+                htmlQuarterFinalsDisplay.write(fileContents)
+                htmlQuarterFinalsDisplay.close()
+                indexPager += 1
+
+
+            htmlResultsDisplayFile = open('resultsQuarterFinalsDisplay.html', 'w')
             fileContents = """
 <html>
   <head>
@@ -573,116 +333,25 @@ class DisplayCompetition(object):
     </title>
   </head>
   <body>
-    <div align='left'><a href='resultsQuarterFinalsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsQuarterFinalsDisplay""" + str(x) + """.html'>Next</a></div><hr>
-    <iframe src='""" + self.quarterFinalsMaps[x] + """' height=1000 width=900 frameborder=0></iframe>
-  </body>
-</html>
+    <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplayCover.html'>Next</a><hr>
+    <div style='float:center'>
 """
-            htmlQuarterFinalsDisplay.write(fileContents)
-            htmlQuarterFinalsDisplay.close()
-            htmlResultsDisplayFile = open('resultsQuarterFinalsDisplay' + str(x) + '.html', 'w')
-            if x < 3:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='quarterFinalsDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='quarterFinalsDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
+            for quarter in self.quarterFinalsPlayers:
+                fileContents += """
     <table border=1>
+""" 
+                for player in quarter:
+                    if player in self.quarterFinalsWinners:
+                        self.scores[player] = 1
+                    fileContents += """
       <tr>
-        <td>""" + self.quarterFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][0]]  + """</td><td>0</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    </div>
-
-  </body>
-</html>
 """
-            else:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='quarterFinalsDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='semiFinalsDisplayCover.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
+            fileContents += """
     </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
+"""
+            fileContents += """
     </div>
     </div>
 
@@ -691,6 +360,7 @@ class DisplayCompetition(object):
 """
             htmlResultsDisplayFile.write(fileContents)
             htmlResultsDisplayFile.close()
+
 
 
     def generateQuarterFinalsCover(self):
@@ -704,43 +374,22 @@ class DisplayCompetition(object):
   </head>
   <body>
     <div align='center' style='width:900px; margin:20px auto;'><a href='quarterFinalsDisplay0.html'>Next</a><hr>
-    <div style='float:left'>
+    <div style='float:center'>
+"""
+        for quarter in self.quarterFinalsPlayers:
+            fileContents += """
     <table border=1>
+""" 
+            for player in quarter:
+                fileContents += """
       <tr>
-        <td>""" + self.quarterFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][0]]  + """</td><td>0</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
+"""
+            fileContents += """
     </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[2][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[2][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-    <table border=1>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][0]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.quarterFinalsPlayers[3][1]  + """</td><td>""" + self.players2Bots['group' + self.quarterFinalsPlayers[3][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
+"""
+        fileContents += """
     </div>
     </div>
 
@@ -758,16 +407,68 @@ class DisplayCompetition(object):
             semiPlayers.add(match.split('-')[1])
             matchDir = self.semiFinalsDir + match
             matchWinner = self.getMatchWinner(matchDir)
-            maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
-            self.semiFinalsMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
+            self.semiFinalsWinners.append(matchWinner)
+            #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
+            semiMaps = []
+            for rnd in os.listdir(self.semiFinalsDir + match):
+                if not rnd.endswith('.txt') and rnd != 'draw':
+                    semiMaps.append(matchDir + '/' + rnd + '/generated.htm')
+                if rnd == 'draw':
+                    for rnd2 in os.listdir(self.semiFinalsDir + match + '/' + rnd):
+                        if not rnd2.endswith('.txt'):
+                            semiMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
+            self.semiFinalsMaps.append(semiMaps)
             self.semiFinalsPlayers.append(list(semiPlayers))
         print self.semiFinalsMaps
         print self.semiFinalsPlayers
 
     def generateSemiFinalsDisplay(self):
         print "Generating semi finals display"
-        for x in range(2):
-            htmlSemiFinalsDisplay = open('semiFinalsDisplay' + str(x) + '.html', 'w')
+        indexPager = 0
+        for smap in self.semiFinalsMaps:
+            print self.semiFinalsMaps
+            rnds = []
+            if len(smap) == 8:
+                rnds = [0,4]
+            else:
+                rnds = [0,4,8]
+            for x in rnds:
+                print smap
+                print x
+                htmlSemiFinalsDisplay = open('semiFinalsDisplay' + str(indexPager)  + '.html', 'w')
+                fileContents = """
+<html>
+  <head>
+    <title>
+      PlanetWars Tournament
+    </title>
+  </head>
+  <body>
+    <div align='left'><a href='semiFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
+                if indexPager > 2:
+                    fileContents += """'resultsSemiFinalsDisplay.html'"""
+                else:
+                    fileContents += """'semiFinalsDisplay""" + str(indexPager + 1) + """.html'"""
+                fileContents += """>Next</a></div><hr>
+    <iframe src='""" + smap[x] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + smap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+                if len(smap) != 10 or x != 8:
+                    fileContents += """
+    <iframe src='""" + smap[x + 2] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + smap[x + 3] + """' height=1000 width=900 frameborder=0></iframe>
+"""
+                fileContents += """
+  </body>
+</html>
+"""
+    
+                htmlSemiFinalsDisplay.write(fileContents)
+                htmlSemiFinalsDisplay.close()
+                indexPager += 1
+
+
+            htmlResultsDisplayFile = open('resultsSemiFinalsDisplay.html', 'w')
             fileContents = """
 <html>
   <head>
@@ -776,83 +477,25 @@ class DisplayCompetition(object):
     </title>
   </head>
   <body>
-    <div align='left'><a href='resultsSemiFinalsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsSemiFinalsDisplay""" + str(x) + """.html'>Next</a></div><hr>
-    <iframe src='""" + self.semiFinalsMaps[x] + """' height=1000 width=900 frameborder=0></iframe>
-  </body>
-</html>
+    <div align='center' style='width:900px; margin:20px auto;'><a href='finalDisplayCover.html'>Next</a><hr>
+    <div style='float:center'>
 """
-            htmlSemiFinalsDisplay.write(fileContents)
-            htmlSemiFinalsDisplay.close()
-            htmlResultsDisplayFile = open('resultsSemiFinalsDisplay' + str(x) + '.html', 'w')
-            if x < 1:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='semiFinalsDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='semiFinalsDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
+            for semi in self.semiFinalsPlayers:
+                fileContents += """
     <table border=1>
+""" 
+                for player in semi:
+                    if player in self.semiFinalsWinners:
+                        self.scores[player] = 1
+                    fileContents += """
       <tr>
-        <td>""" + self.semiFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][0]]  + """</td><td>0</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
-    </div>
-    </div>
-  </body>
-</html>
 """
-            else:
-                fileContents = """
-<html>
-  <head>
-    <title>
-      PlanetWars Tournament
-    </title>
-  </head>
-  <body>
-    <div align='left'><a href='semiFinalsDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='finalDisplayCover.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
-    <table border=1>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
+            fileContents += """
     </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
+"""
+            fileContents += """
     </div>
     </div>
 
@@ -861,7 +504,6 @@ class DisplayCompetition(object):
 """
             htmlResultsDisplayFile.write(fileContents)
             htmlResultsDisplayFile.close()
-
 
     def generateSemiFinalsCover(self):
         htmlCoverSemiFinalsPage = open('semiFinalsDisplayCover.html', 'w')
@@ -873,35 +515,30 @@ class DisplayCompetition(object):
     </title>
   </head>
   <body>
-    <div align='center'><a href='semiFinalsDisplay0.html'>Next</a></div><hr>
-    <div align='center' style='width:900px; margin:20px auto;'>
-    <div style='float:left'>
+    <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplay0.html'>Next</a><hr>
+    <div style='float:center'>
+"""
+        for semi in self.semiFinalsPlayers:
+            fileContents += """
     <table border=1>
+""" 
+            for player in semi:
+                fileContents += """
       <tr>
-        <td>""" + self.semiFinalsPlayers[0][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][0]]  + """</td><td>0</td>
+        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[0][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[0][1]]  + """</td><td>0</td>
-      </tr>
+"""
+            fileContents += """
     </table>
-
-    </div>
-    <div style='float:right'>
-    <table border=1>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][0]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][0]]  + """</td><td>0</td>
-      </tr>
-      <tr>
-        <td>""" + self.semiFinalsPlayers[1][1]  + """</td><td>""" + self.players2Bots['group' + self.semiFinalsPlayers[1][1]]  + """</td><td>0</td>
-      </tr>
-    </table>
-
+"""
+        fileContents += """
     </div>
     </div>
 
   </body>
 </html>
 """
+
         htmlCoverSemiFinalsPage.write(fileContents)
         htmlCoverSemiFinalsPage.close()
 
