@@ -1,5 +1,6 @@
 import os
 import webbrowser
+import sys
 from HTMLParser import HTMLParser
 from random import randint
 
@@ -82,7 +83,8 @@ class DisplayCompetition(object):
                 matchDir = self.leaguesDir + str(league) + '/' + match
                 matchWinner = self.getMatchWinner(matchDir)
                 maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
-                self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
+                if maxSizeRoundFile:
+                    self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
             self.leaguesPlayers.append(list(leaguePlayers))
             #print self.leaguesMaps
         #print len(self.leaguesMaps)
@@ -94,6 +96,7 @@ class DisplayCompetition(object):
                 self.scores[player] = 0
 
     def initScoreFinal(self):
+        self.finalScores['0'] = 0
         for player in self.finalPlayers:
             self.finalScores[player] = 0
 
@@ -137,13 +140,17 @@ class DisplayCompetition(object):
 
     def getMapToDisplay(self, matchDir, matchWinner):
         wonRoundFiles = [rnd for rnd in listdir_nohidden(matchDir) if rnd.split('_')[0] == 'w' + matchWinner and rnd.split('.')[-1] != 'txt']
-        selectedMap = wonRoundFiles[randint(0,len(wonRoundFiles)-1)]
-        if self.drawFlag:
-            self.drawMaps.append(selectedMap)
-            self.drawFlag = False
-            print "FOOOOOOOOOOOOOOOO"
-            print self.drawMaps
-        return selectedMap
+        try:
+            selectedMap = wonRoundFiles[randint(0,len(wonRoundFiles)-1)]
+            if self.drawFlag:
+                self.drawMaps.append(selectedMap)
+                self.drawFlag = False
+                print "FOOOOOOOOOOOOOOOO"
+                print self.drawMaps
+            return selectedMap
+        except ValueError:
+            print "unable to find map in dir. Probably crashed for all maps"
+       
 
     def resetScores(self):
         for x,y in self.scores.iteritems():
@@ -164,7 +171,7 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='resultsDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsDisplay""" + str(x) + """.html'>Next</a></div><hr>
+    <div class="next"><a href='resultsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 10] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 20] + """' height=1000 width=900 frameborder=0></iframe>
@@ -225,30 +232,32 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='leagueDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='"""
+    <div class="next"><a href='"""
             if x < 8:
                 fileContents += """leagueDisplay""" + str(x + 1) + """.html"""
             else:
                 fileContents += """quarterFinalsDisplayCover.html"""
             fileContents += """
-'>Next</a></div><hr>
+'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
     <div style='float:center'>
 """
-
+            leagueId = 1
             for league in self.leaguesPlayers:
+                
                 fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Group Stage """ + str(leagueId) + """</th></tr>
 """ 
                 for player in league:
                     fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
                 fileContents += """
     </table>
-"""
+"""             
+                leagueId +=  1
             fileContents += """
     </div>
     </div>
@@ -270,22 +279,24 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center' style='width:900px; margin:20px auto;'><a href='leagueDisplay0.html'>Next</a><hr>
+    <div class="next"><a href='leagueDisplay0.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
+        leagueId = 1
         for league in self.leaguesPlayers:
             fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Group Stage """ + str(leagueId) + """</th></tr>
 """ 
             for player in league:
                 fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+       <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
             fileContents += """
     </table>
 """
+            leagueId += 1
         fileContents += """
     </div>
     </div>
@@ -340,12 +351,12 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='quarterFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
+    <div class="next"><a href="""
                 if indexPager > 8:
                     fileContents += """'resultsQuarterFinalsDisplay.html'"""
                 else:
                     fileContents += """'quarterFinalsDisplay""" + str(indexPager + 1) + """.html'"""
-                fileContents += """>Next</a></div><hr>
+                fileContents += """><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + qmap[x] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + qmap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
 """
@@ -374,22 +385,24 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplayCover.html'>Next</a><hr>
+    <div class="next"><a href='semiFinalsDisplayCover.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
+            quarterFinalId = 1;
             for quarter in self.quarterFinalsPlayers:
                 fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Quarter Final """ + str(quarterFinalId) + """</th></tr>
 """ 
                 for player in quarter:
                     if player in self.quarterFinalsWinners:
                         self.scores[player] = 1
                     fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+       <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
-            fileContents += """
+                quarterFinalId += 1
+                fileContents += """
     </table>
 """
             fileContents += """
@@ -415,22 +428,24 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center' style='width:900px; margin:20px auto;'><a href='quarterFinalsDisplay0.html'>Next</a><hr>
+    <div class="next"><a href='quarterFinalsDisplay0.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
+        quarterFinalId = 1
         for quarter in self.quarterFinalsPlayers:
             fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Quarter Final """ + str(quarterFinalId) + """</th></tr>
 """ 
             for player in quarter:
                 fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
             fileContents += """
     </table>
 """
+            quarterFinalId += 1
         fileContents += """
     </div>
     </div>
@@ -484,12 +499,12 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='semiFinalsDisplay""" + str(indexPager - 1) + """.html'>Previous</a></div><div align='right'><a href="""
+    <div class="next"><a href="""
                 if indexPager > 2:
                     fileContents += """'resultsSemiFinalsDisplay.html'"""
                 else:
                     fileContents += """'semiFinalsDisplay""" + str(indexPager + 1) + """.html'"""
-                fileContents += """>Next</a></div><hr>
+                fileContents += """><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + smap[x] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + smap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
 """
@@ -518,24 +533,27 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center' style='width:900px; margin:20px auto;'><a href='finalDisplayCover.html'>Next</a><hr>
+    <div class="next"><a href='finalDisplayCover.html'><img src="imgs/next.png" height="16px" width="16px"></img></a><div>
     <div style='float:center'>
 """
+            semiFinalId = 1
             for semi in self.semiFinalsPlayers:
                 fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Semi Final """ + str(semiFinalId) + """</th></tr>
 """ 
                 for player in semi:
                     if player in self.semiFinalsWinners:
                         self.scores[player] = 1
                     fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
-            fileContents += """
+                fileContents += """
     </table>
 """
+                semiFinalId += 1
+            
             fileContents += """
     </div>
     </div>
@@ -557,22 +575,24 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center' style='width:900px; margin:20px auto;'><a href='semiFinalsDisplay0.html'>Next</a><hr>
+    <div class="next"><a href='semiFinalsDisplay0.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
+        semiFinalId = 1
         for semi in self.semiFinalsPlayers:
             fileContents += """
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Semi Final """ + str(semiFinalId) + """</th></tr>
 """ 
             for player in semi:
                 fileContents += """
       <tr>
-        <td>""" + player  + """</td><td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
             fileContents += """
     </table>
 """
+            semiFinalId += 1
         fileContents += """
     </div>
     </div>
@@ -608,7 +628,7 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='resultsFinalDisplay""" + str(x - 1) + """.html'>Previous</a></div><div align='right'><a href='resultsFinalDisplay""" + str(x) + """.html'>Next</a></div><hr>
+    <div class="next"><a href='resultsFinalDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + self.finalMaps[x] + """' height=1000 width=900 frameborder=0></iframe>
   </body>
 </html>
@@ -617,7 +637,7 @@ class DisplayCompetition(object):
             htmlFinalDisplay.close()
 
             self.finalScores[self.finalMaps[x].split('/')[-2].split('_')[0][1:]] += 1
-
+            
             htmlResultsDisplayFile = open('resultsFinalDisplay' + str(x) + '.html', 'w')
             if x < 7:
                 fileContents = """
@@ -629,15 +649,15 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='finalDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='finalDisplay""" + str(x + 1) + """.html'>Next</a></div><hr>
+    <div class="next"><a href='finalDisplay""" + str(x + 1) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Final</th></tr>
       <tr>
-        <td>""" + self.finalPlayers[0]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
+        <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
       </tr>
       <tr>
-        <td>""" + self.finalPlayers[1]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
+        <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
       </tr>
     </table>
 
@@ -656,15 +676,15 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='left'><a href='finalDisplay""" + str(x) + """.html'>Previous</a></div><div align='right'><a href='championDisplay.html'>Next</a></div><hr>
+    <div class="next"><a href='championDisplay.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Final</th></tr>
       <tr>
-        <td>""" + self.finalPlayers[0]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
+        <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
       </tr>
       <tr>
-        <td>""" + self.finalPlayers[1]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
+        <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
       </tr>
     </table>
 
@@ -691,15 +711,15 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div align='center'><a href='finalDisplay0.html'>Next</a></div><hr>
+    <div class="next"><a href='finalDisplay0.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table border=1>
+    <table><tr><th colspan="2" align="center">Final</th></tr>
       <tr>
-        <td>""" + self.finalPlayers[0]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>0</td>
+       <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>0</td>
       </tr>
       <tr>
-        <td>""" + self.finalPlayers[1]  + """</td><td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>0</td>
+      <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>0</td>
       </tr>
     </table>
 
