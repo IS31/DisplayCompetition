@@ -1,0 +1,10 @@
+league*.html
+final*.html
+quarterFinal*.html
+champion*.html
+semiFinal*.html
+results*.html
+.buildpath
+.project
+.pydevproject
+.settings
