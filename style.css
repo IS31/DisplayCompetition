@@ -31,8 +31,10 @@ table
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
-	margin: 45px;
-	width: 480px;
+	margin: 20px;
+	width: 300px;
 	text-align: left;
 	border-collapse: collapse;
+	display: inline-block;
 }
+#table_container{width:300px;margin:0 auto;}
