@@ -165,6 +165,9 @@ class DisplayCompetition(object):
             fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -226,6 +229,9 @@ class DisplayCompetition(object):
             fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -246,8 +252,8 @@ class DisplayCompetition(object):
             for league in self.leaguesPlayers:
                 
                 fileContents += """
-    <table><tr><th colspan="2" align="center">Group Stage """ + str(leagueId) + """</th></tr>
-""" 
+    <table class="tablesorter"><thead><tr><th align="left">Group Stage """ + str(leagueId) + """</th><th>&nbsp;</th></tr></thead><tbody>
+"""             
                 for player in league:
                     fileContents += """
       <tr>
@@ -255,7 +261,7 @@ class DisplayCompetition(object):
       </tr>
 """
                 fileContents += """
-    </table>
+    </tbody></table>
 """             
                 leagueId +=  1
             fileContents += """
@@ -273,6 +279,9 @@ class DisplayCompetition(object):
         fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -285,7 +294,7 @@ class DisplayCompetition(object):
         leagueId = 1
         for league in self.leaguesPlayers:
             fileContents += """
-    <table><tr><th colspan="2" align="center">Group Stage """ + str(leagueId) + """</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Group Stage """ + str(leagueId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
             for player in league:
                 fileContents += """
@@ -294,7 +303,7 @@ class DisplayCompetition(object):
       </tr>
 """
             fileContents += """
-    </table>
+    </tbody></table>
 """
             leagueId += 1
         fileContents += """
@@ -345,6 +354,9 @@ class DisplayCompetition(object):
                 fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -379,6 +391,9 @@ class DisplayCompetition(object):
             fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -391,7 +406,7 @@ class DisplayCompetition(object):
             quarterFinalId = 1;
             for quarter in self.quarterFinalsPlayers:
                 fileContents += """
-    <table><tr><th colspan="2" align="center">Quarter Final """ + str(quarterFinalId) + """</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Quarter Final """ + str(quarterFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in quarter:
                     if player in self.quarterFinalsWinners:
@@ -403,7 +418,7 @@ class DisplayCompetition(object):
 """
                 quarterFinalId += 1
                 fileContents += """
-    </table>
+    </tbody></table>
 """
             fileContents += """
     </div>
@@ -422,6 +437,9 @@ class DisplayCompetition(object):
         fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -434,7 +452,7 @@ class DisplayCompetition(object):
         quarterFinalId = 1
         for quarter in self.quarterFinalsPlayers:
             fileContents += """
-    <table><tr><th colspan="2" align="center">Quarter Final """ + str(quarterFinalId) + """</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Quarter Final """ + str(quarterFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
             for player in quarter:
                 fileContents += """
@@ -443,7 +461,7 @@ class DisplayCompetition(object):
       </tr>
 """
             fileContents += """
-    </table>
+    </tbody></table>
 """
             quarterFinalId += 1
         fileContents += """
@@ -493,6 +511,9 @@ class DisplayCompetition(object):
                 fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -527,6 +548,9 @@ class DisplayCompetition(object):
             fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -539,7 +563,7 @@ class DisplayCompetition(object):
             semiFinalId = 1
             for semi in self.semiFinalsPlayers:
                 fileContents += """
-    <table><tr><th colspan="2" align="center">Semi Final """ + str(semiFinalId) + """</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Semi Final """ + str(semiFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in semi:
                     if player in self.semiFinalsWinners:
@@ -550,7 +574,7 @@ class DisplayCompetition(object):
       </tr>
 """
                 fileContents += """
-    </table>
+    </tbody></table>
 """
                 semiFinalId += 1
             
@@ -569,6 +593,9 @@ class DisplayCompetition(object):
         fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -581,7 +608,7 @@ class DisplayCompetition(object):
         semiFinalId = 1
         for semi in self.semiFinalsPlayers:
             fileContents += """
-    <table><tr><th colspan="2" align="center">Semi Final """ + str(semiFinalId) + """</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Semi Final """ + str(semiFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
             for player in semi:
                 fileContents += """
@@ -590,7 +617,7 @@ class DisplayCompetition(object):
       </tr>
 """
             fileContents += """
-    </table>
+    </tbody></table>
 """
             semiFinalId += 1
         fileContents += """
@@ -622,6 +649,9 @@ class DisplayCompetition(object):
             fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -643,6 +673,9 @@ class DisplayCompetition(object):
                 fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -652,14 +685,14 @@ class DisplayCompetition(object):
     <div class="next"><a href='finalDisplay""" + str(x + 1) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table><tr><th colspan="2" align="center">Final</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Final</th><th>&nbsp;</th></tr></thead><tbody>
       <tr>
         <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
       </tr>
       <tr>
         <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
       </tr>
-    </table>
+    </tbody></table>
 
     </div>
 
@@ -670,6 +703,9 @@ class DisplayCompetition(object):
                 fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -679,14 +715,14 @@ class DisplayCompetition(object):
     <div class="next"><a href='championDisplay.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table><tr><th colspan="2" align="center">Final</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Final</th><th>&nbsp;</th></tr></thead><tbody>
       <tr>
         <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
       </tr>
       <tr>
         <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[1]])  + """</td>
       </tr>
-    </table>
+    </tbody></table>
 
     </div>
 
@@ -705,6 +741,9 @@ class DisplayCompetition(object):
         fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
@@ -714,14 +753,14 @@ class DisplayCompetition(object):
     <div class="next"><a href='finalDisplay0.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
 
-    <table><tr><th colspan="2" align="center">Final</th></tr>
+    <table class="tablesorter"><thead><tr><th align="left">Final</th><th>&nbsp;</th></tr></thead><tbody>
       <tr>
        <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>0</td>
       </tr>
       <tr>
       <td>""" + self.players2Bots['group' + self.finalPlayers[1]]  + """</td><td>0</td>
       </tr>
-    </table>
+    </tbody></table>
 
     </div>
   </body>
@@ -740,6 +779,9 @@ class DisplayCompetition(object):
         fileContents = """
 <html>
   <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
     <title>
       PlanetWars Tournament
     </title>
