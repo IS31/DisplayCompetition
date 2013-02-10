@@ -712,9 +712,9 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div class="next"><a href='championDisplay.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div align='center' style='width:900px; margin:20px auto;'>
-
+    <img src="imgs/winnertext.png"></img><br>
+    <img src="imgs/marvin.jpg"></img><br>
     <table class="tablesorter"><thead><tr><th align="left">Final</th><th>&nbsp;</th></tr></thead><tbody>
       <tr>
         <td>""" + self.players2Bots['group' + self.finalPlayers[0]]  + """</td><td>""" + str(self.finalScores[self.finalPlayers[0]])  + """</td>
