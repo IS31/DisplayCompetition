@@ -364,7 +364,7 @@ class DisplayCompetition(object):
   </head>
   <body>
     <div class="next"><a href="""
-                if indexPager > 8:
+                if indexPager > 6:
                     fileContents += """'resultsQuarterFinalsDisplay.html'"""
                 else:
                     fileContents += """'quarterFinalsDisplay""" + str(indexPager + 1) + """.html'"""
