@@ -75,6 +75,7 @@ class DisplayCompetition(object):
         for d in listdir_nohidden(self.submissionsDir):
             f = open(self.submissionsDir + d + '/bot.txt', 'r')
             self.players2Bots[d] = f.readline()
+        print self.players2Bots
 
     def doLeagues(self):
         for league in range(1, self.numberOfLeagues + 1):
@@ -89,8 +90,8 @@ class DisplayCompetition(object):
                     self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
             self.leaguesPlayers.append(list(leaguePlayers))
             #print self.leaguesMaps
-        print len(self.leaguesMaps)
-        #print self.leaguesPlayers
+        #print len(self.leaguesMaps)
+        print self.leaguesPlayers
 
     def initScoreRounds(self):
         for league in self.leaguesPlayers:
@@ -166,7 +167,12 @@ class DisplayCompetition(object):
         #roundDisplayParser = RoundDisplayHTMLParser()
         #roundDisplayParser.feed()
 
-        for x in range(12):
+        n = len(self.leaguesPlayers[0]) - 1
+        m = len(self.leaguesPlayers[1]) - 1
+        maxMatchesLargestLeague = (n * (n + 1))/2
+        maxMatchesRegularLeagues = (m * (m + 1))/2
+        print maxMatchesLargestLeague
+        for x in range(maxMatchesLargestLeague):
             htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
             fileContents = """
 <html>
@@ -183,7 +189,7 @@ class DisplayCompetition(object):
     <div class="next"><a href='resultsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
 """
-            if x < 10:
+            if x < maxMatchesRegularLeagues:
                 fileContents += """
     <iframe src='""" + self.leaguesMaps[x + 15] + """' height=1000 width=900 frameborder=0></iframe>
     <iframe src='""" + self.leaguesMaps[x + 25] + """' height=1000 width=900 frameborder=0></iframe>
@@ -197,7 +203,7 @@ class DisplayCompetition(object):
             htmlLeagueDisplayFile.close()
             
             winner1 = self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]
-            if x < 10:
+            if x < maxMatchesRegularLeagues:
                 winner2 = self.leaguesMaps[x+15].split('/')[-2].split('_')[0][1:]
                 winner3 = self.leaguesMaps[x+25].split('/')[-2].split('_')[0][1:]
                 winner4 = self.leaguesMaps[x+35].split('/')[-2].split('_')[0][1:]
@@ -245,7 +251,7 @@ class DisplayCompetition(object):
   </head>
   <body>
     <div class="next"><a href='"""
-            if x < 11:
+            if x < maxMatchesLargestLeague - 1:
                 fileContents += """leagueDisplay""" + str(x + 1) + """.html"""
             else:
                 fileContents += """quarterFinalsDisplayCover.html"""
