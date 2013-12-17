@@ -141,6 +141,21 @@ class DisplayCompetition(object):
         #print "Group {} wins against group {}".format(matchWinner, matchLooser)
         return matchWinner
 
+    def getMatchesWinners(self, matchDir):
+        winnerSequence = []
+        match = matchDir.split('/')[-1]
+        playerA = match.split('-')[0]
+        playerAWins = 0
+        playerB = match.split('-')[1]
+        playerBWins = 0
+        for rnd in listdir_nohidden(matchDir):
+            if not rnd.endswith('.txt') and rnd != 'draw':
+                winner = rnd.split('_')[0][1:]
+            if rnd == 'draw':
+                winner = 0
+            winnerSequence.append(winner)
+        return winnerSequence
+
     def getMapToDisplay(self, matchDir, matchWinner):
         wonRoundFiles = [rnd for rnd in listdir_nohidden(matchDir) if rnd.split('_')[0] == 'w' + matchWinner and rnd.split('.')[-1] != 'txt']
         if len(wonRoundFiles) == 0:
@@ -334,8 +349,8 @@ class DisplayCompetition(object):
             quarterPlayers.add(match.split('-')[0])
             quarterPlayers.add(match.split('-')[1])
             matchDir = self.quarterFinalsDir + match
-            matchWinner = self.getMatchWinner(matchDir)
-            self.quarterFinalsWinners.append(matchWinner)
+            matchesWinners = self.getMatchesWinners(matchDir)
+            self.quarterFinalsWinners.append(matchesWinners)
             #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
             quarterMaps = []
             for rnd in listdir_nohidden(self.quarterFinalsDir + match):
@@ -349,57 +364,18 @@ class DisplayCompetition(object):
             self.quarterFinalsPlayers.append(list(quarterPlayers))
         print self.quarterFinalsPlayers
         print self.quarterFinalsMaps
+        print self.quarterFinalsWinners
 
     def generateQuarterFinalsDisplay(self):
         print "Generating quarter finals display"
         indexPager = 0
+        maxQuarterFinalsMatches = 0
         for qmap in self.quarterFinalsMaps:
-            rnds = []
-            if len(qmap) == 8:
-                rnds = [0,4]
-            else:
-                rnds = [0,4,8]
-            for x in rnds:
-                #print qmap
-                #print x
-                htmlQuarterFinalsDisplay = open('quarterFinalsDisplay' + str(indexPager)  + '.html', 'w')
-                fileContents = """
-<html>
-  <head>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="js/jquery.tablesorter.js"></script>
-  <script src="js/competition.js"></script>
-    <title>
-      PlanetWars Tournament
-    </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
-  <body>
-    <div class="next"><a href="""
-                if indexPager > 6:
-                    fileContents += """'resultsQuarterFinalsDisplay.html'"""
-                else:
-                    fileContents += """'quarterFinalsDisplay""" + str(indexPager + 1) + """.html'"""
-                fileContents += """><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
-    <iframe src='""" + qmap[x] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + qmap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
-"""
-                if len(qmap) != 10 or x != 8:
-                    fileContents += """
-    <iframe src='""" + qmap[x + 2] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + qmap[x + 3] + """' height=1000 width=900 frameborder=0></iframe>
-"""
-                fileContents += """
-  </body>
-</html>
-"""
-    
-                htmlQuarterFinalsDisplay.write(fileContents)
-                htmlQuarterFinalsDisplay.close()
-                indexPager += 1
-
-
-            htmlResultsDisplayFile = open('resultsQuarterFinalsDisplay.html', 'w')
+            if len(qmap) > maxQuarterFinalsMatches:
+                maxQuarterFinalsMatches = len(qmap)
+        print maxQuarterFinalsMatches
+        for x in range(maxQuarterFinalsMatches):
+            htmlQuarterFinalsDisplay = open('quarterFinalsDisplay' + str(indexPager)  + '.html', 'w')
             fileContents = """
 <html>
   <head>
@@ -412,7 +388,56 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div class="next"><a href='semiFinalsDisplayCover.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
+    <div class="next"><a href='resultsQuarterFinalsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>"""
+
+            if x < len(self.quarterFinalsMaps[0]):
+                fileContents += """        
+    <iframe src='""" + self.quarterFinalsMaps[0][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+            if x < len(self.quarterFinalsMaps[1]):
+                fileContents += """        
+    <iframe src='""" + self.quarterFinalsMaps[1][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+            if x < len(self.quarterFinalsMaps[2]):
+                fileContents += """        
+    <iframe src='""" + self.quarterFinalsMaps[2][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+            if x < len(self.quarterFinalsMaps[3]):
+                fileContents += """        
+    <iframe src='""" + self.quarterFinalsMaps[3][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+
+            fileContents += """
+  </body>
+</html>
+"""
+    
+            htmlQuarterFinalsDisplay.write(fileContents)
+            htmlQuarterFinalsDisplay.close()
+            indexPager += 1
+
+
+            htmlResultsDisplayFile = open('resultsQuarterFinalsDisplay' + str(x) + '.html', 'w')
+            fileContents = """
+<html>
+  <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
+    <title>
+      PlanetWars Tournament
+    </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+"""
+            if x < maxQuarterFinalsMatches - 1:
+                fileContents +="""
+    <div class="next"><a href='quarterFinalsDisplay""" + str(x + 1)  + """.html'>
+"""
+            else:
+                fileContents +="""
+    <div class="next"><a href='semiFinalsDisplayCover.html'>
+"""
+
+            fileContents +="""
+<img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
             quarterFinalId = 1;
@@ -421,8 +446,8 @@ class DisplayCompetition(object):
     <table class="tablesorter"><thead><tr><th align="left">Quarter Final """ + str(quarterFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in quarter:
-                    if player in self.quarterFinalsWinners:
-                        self.scores[player] = 1
+                    if x < len(self.quarterFinalsWinners[quarterFinalId-1]) and player == self.quarterFinalsWinners[quarterFinalId-1][x]:
+                        self.scores[player] += 1
                     fileContents += """
       <tr>
        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
@@ -493,8 +518,8 @@ class DisplayCompetition(object):
             semiPlayers.add(match.split('-')[0])
             semiPlayers.add(match.split('-')[1])
             matchDir = self.semiFinalsDir + match
-            matchWinner = self.getMatchWinner(matchDir)
-            self.semiFinalsWinners.append(matchWinner)
+            matchesWinners = self.getMatchesWinners(matchDir)
+            self.semiFinalsWinners.append(matchesWinners)
             #maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
             semiMaps = []
             for rnd in listdir_nohidden(self.semiFinalsDir + match):
@@ -512,51 +537,13 @@ class DisplayCompetition(object):
     def generateSemiFinalsDisplay(self):
         print "Generating semi finals display"
         indexPager = 0
+        maxSemiFinalsMatches = 0
         for smap in self.semiFinalsMaps:
-            rnds = []
-            if len(smap) == 8:
-                rnds = [0,4]
-            else:
-                rnds = [0,4,8]
-            for x in rnds:
-                htmlSemiFinalsDisplay = open('semiFinalsDisplay' + str(indexPager)  + '.html', 'w')
-                fileContents = """
-<html>
-  <head>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="js/jquery.tablesorter.js"></script>
-  <script src="js/competition.js"></script>
-    <title>
-      PlanetWars Tournament
-    </title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
-  <body>
-    <div class="next"><a href="""
-                if indexPager > 2:
-                    fileContents += """'resultsSemiFinalsDisplay.html'"""
-                else:
-                    fileContents += """'semiFinalsDisplay""" + str(indexPager + 1) + """.html'"""
-                fileContents += """><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
-    <iframe src='""" + smap[x] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + smap[x + 1] + """' height=1000 width=900 frameborder=0></iframe>
-"""
-                if len(smap) != 10 or x != 8:
-                    fileContents += """
-    <iframe src='""" + smap[x + 2] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + smap[x + 3] + """' height=1000 width=900 frameborder=0></iframe>
-"""
-                fileContents += """
-  </body>
-</html>
-"""
-    
-                htmlSemiFinalsDisplay.write(fileContents)
-                htmlSemiFinalsDisplay.close()
-                indexPager += 1
-
-
-            htmlResultsDisplayFile = open('resultsSemiFinalsDisplay.html', 'w')
+            if len(smap) > maxSemiFinalsMatches:
+                maxSemiFinalsMatches = len(smap)
+        print maxSemiFinalsMatches
+        for x in range(maxSemiFinalsMatches):
+            htmlSemiFinalsDisplay = open('semiFinalsDisplay' + str(indexPager)  + '.html', 'w')
             fileContents = """
 <html>
   <head>
@@ -569,27 +556,70 @@ class DisplayCompetition(object):
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div class="next"><a href='finalDisplayCover.html'><img src="imgs/next.png" height="16px" width="16px"></img></a><div>
+    <div class="next"><a href='resultsSemiFinalsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>"""
+
+            if x < len(self.semiFinalsMaps[0]):
+                fileContents += """        
+    <iframe src='""" + self.semiFinalsMaps[0][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+            if x < len(self.semiFinalsMaps[1]):
+                fileContents += """        
+    <iframe src='""" + self.semiFinalsMaps[1][x] + """' height=1000 width=900 frameborder=0></iframe>"""
+
+            fileContents += """
+  </body>
+</html>
+"""
+    
+            htmlSemiFinalsDisplay.write(fileContents)
+            htmlSemiFinalsDisplay.close()
+            indexPager += 1
+
+
+            htmlResultsDisplayFile = open('resultsSemiFinalsDisplay' + str(x) + '.html', 'w')
+            fileContents = """
+<html>
+  <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="js/jquery.tablesorter.js"></script>
+  <script src="js/competition.js"></script>
+    <title>
+      PlanetWars Tournament
+    </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+"""
+            if x < maxSemiFinalsMatches - 1:
+                fileContents +="""
+    <div class="next"><a href='semiFinalsDisplay""" + str(x + 1)  + """.html'>
+"""
+            else:
+                fileContents +="""
+    <div class="next"><a href='finalDisplayCover.html'>
+"""
+
+            fileContents +="""
+<img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <div style='float:center'>
 """
-            semiFinalId = 1
+            semiFinalId = 1;
+            print self.semiFinalsWinners
             for semi in self.semiFinalsPlayers:
                 fileContents += """
     <table class="tablesorter"><thead><tr><th align="left">Semi Final """ + str(semiFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in semi:
-                    if player in self.semiFinalsWinners:
-                        self.scores[player] = 1
+                    if x < len(self.semiFinalsWinners[semiFinalId-1]) and player == self.semiFinalsWinners[semiFinalId-1][x]:
+                        self.scores[player] += 1
                     fileContents += """
       <tr>
-        <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
+       <td>""" + self.players2Bots['group' + player]  + """</td><td>""" + str(self.scores[player]) + """</td>
       </tr>
 """
+                semiFinalId += 1
                 fileContents += """
     </tbody></table>
 """
-                semiFinalId += 1
-            
             fileContents += """
     </div>
     </div>
@@ -599,6 +629,9 @@ class DisplayCompetition(object):
 """
             htmlResultsDisplayFile.write(fileContents)
             htmlResultsDisplayFile.close()
+
+
+
 
     def generateSemiFinalsCover(self):
         htmlCoverSemiFinalsPage = open('semiFinalsDisplayCover.html', 'w')
