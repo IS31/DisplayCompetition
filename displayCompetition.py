@@ -158,6 +158,12 @@ class DisplayCompetition(object):
                 winnerSequence.append(winner)
         return winnerSequence
 
+    def earlyWinner(self, players, score):
+        for p in players:
+            if self.scores[p] == len(score)/2 + 1:
+                return True
+        return False
+
     def getMapToDisplay(self, matchDir, matchWinner):
         wonRoundFiles = [rnd for rnd in listdir_nohidden(matchDir) if rnd.split('_')[0] == 'w' + matchWinner and rnd.split('.')[-1] != 'txt']
         if len(wonRoundFiles) == 0:
@@ -391,16 +397,16 @@ class DisplayCompetition(object):
   <body>
     <div class="next"><a href='resultsQuarterFinalsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>"""
 
-            if x < len(self.quarterFinalsMaps[0]):
+            if not self.earlyWinner(self.quarterFinalsPlayers[0], self.quarterFinalsWinners[0]) and  x < len(self.quarterFinalsMaps[0]):
                 fileContents += """        
     <iframe src='""" + self.quarterFinalsMaps[0][x] + """' height=1000 width=900 frameborder=0></iframe>"""
-            if x < len(self.quarterFinalsMaps[1]):
+            if not self.earlyWinner(self.quarterFinalsPlayers[1], self.quarterFinalsWinners[1]) and x < len(self.quarterFinalsMaps[1]):
                 fileContents += """        
     <iframe src='""" + self.quarterFinalsMaps[1][x] + """' height=1000 width=900 frameborder=0></iframe>"""
-            if x < len(self.quarterFinalsMaps[2]):
+            if not self.earlyWinner(self.quarterFinalsPlayers[2], self.quarterFinalsWinners[2]) and x < len(self.quarterFinalsMaps[2]):
                 fileContents += """        
     <iframe src='""" + self.quarterFinalsMaps[2][x] + """' height=1000 width=900 frameborder=0></iframe>"""
-            if x < len(self.quarterFinalsMaps[3]):
+            if not self.earlyWinner(self.quarterFinalsPlayers[3], self.quarterFinalsWinners[3]) and x < len(self.quarterFinalsMaps[3]):
                 fileContents += """        
     <iframe src='""" + self.quarterFinalsMaps[3][x] + """' height=1000 width=900 frameborder=0></iframe>"""
 
@@ -447,7 +453,7 @@ class DisplayCompetition(object):
     <table class="tablesorter"><thead><tr><th align="left">Quarter Final """ + str(quarterFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in quarter:
-                    if x < len(self.quarterFinalsWinners[quarterFinalId-1]) and player == self.quarterFinalsWinners[quarterFinalId-1][x]:
+                    if x < len(self.quarterFinalsWinners[quarterFinalId-1]) and player == self.quarterFinalsWinners[quarterFinalId-1][x] and not self.earlyWinner(quarter, self.quarterFinalsWinners[quarterFinalId-1]):
                         self.scores[player] += 1
                     fileContents += """
       <tr>
@@ -558,10 +564,10 @@ class DisplayCompetition(object):
   <body>
     <div class="next"><a href='resultsSemiFinalsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>"""
 
-            if x < len(self.semiFinalsMaps[0]):
+            if not self.earlyWinner(self.semiFinalsPlayers[0], self.semiFinalsWinners[0]) and x < len(self.semiFinalsMaps[0]):
                 fileContents += """        
     <iframe src='""" + self.semiFinalsMaps[0][x] + """' height=1000 width=900 frameborder=0></iframe>"""
-            if x < len(self.semiFinalsMaps[1]):
+            if not self.earlyWinner(self.semiFinalsPlayers[1], self.semiFinalsWinners[1]) and x < len(self.semiFinalsMaps[1]):
                 fileContents += """        
     <iframe src='""" + self.semiFinalsMaps[1][x] + """' height=1000 width=900 frameborder=0></iframe>"""
 
@@ -609,7 +615,7 @@ class DisplayCompetition(object):
     <table class="tablesorter"><thead><tr><th align="left">Semi Final """ + str(semiFinalId) + """</th><th>&nbsp;</th></tr></thead><tbody>
 """ 
                 for player in semi:
-                    if x < len(self.semiFinalsWinners[semiFinalId-1]) and player == self.semiFinalsWinners[semiFinalId-1][x]:
+                    if x < len(self.semiFinalsWinners[semiFinalId-1]) and player == self.semiFinalsWinners[semiFinalId-1][x] and not self.earlyWinner(semi, self.semiFinalsWinners[semiFinalId-1]):
                         self.scores[player] += 1
                     fileContents += """
       <tr>
@@ -714,7 +720,7 @@ class DisplayCompetition(object):
             self.finalScores[self.finalMaps[x].split('/')[-2].split('_')[0][1:]] += 1
             
             htmlResultsDisplayFile = open('resultsFinalDisplay' + str(x) + '.html', 'w')
-            if x < 7:
+            if x < len(self.finalMaps) - 1 and self.finalScores[self.finalPlayers[0]] < len(self.finalMaps)/2 + 1 and self.finalScores[self.finalPlayers[1]] < len(self.finalMaps)/2 + 1:
                 fileContents = """
 <html>
   <head>
