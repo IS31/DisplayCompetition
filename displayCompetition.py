@@ -149,11 +149,13 @@ class DisplayCompetition(object):
         playerB = match.split('-')[1]
         playerBWins = 0
         for rnd in listdir_nohidden(matchDir):
+            winner = -1
             if not rnd.endswith('.txt') and rnd != 'draw':
-                winner = rnd.split('_')[0][1:]
-            if rnd == 'draw':
-                winner = 0
-            winnerSequence.append(winner)
+                if os.path.isdir(self.semiFinalsDir + match + '/draw/') and rnd in listdir_nohidden(self.semiFinalsDir + match + '/draw/'):
+                    winner = 0
+                else:
+                    winner = rnd.split('_')[0][1:]
+                winnerSequence.append(winner)
         return winnerSequence
 
     def getMapToDisplay(self, matchDir, matchWinner):
@@ -355,11 +357,10 @@ class DisplayCompetition(object):
             quarterMaps = []
             for rnd in listdir_nohidden(self.quarterFinalsDir + match):
                 if not rnd.endswith('.txt') and rnd != 'draw':
-                    quarterMaps.append(matchDir + '/' + rnd + '/generated.htm')
-                if rnd == 'draw':
-                    for rnd2 in listdir_nohidden(self.quarterFinalsDir + match + '/' + rnd):
-                        if not rnd2.endswith('.txt'):
-                            quarterMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
+                    if os.path.isdir(self.quarterFinalsDir + match + '/draw/') and rnd  in listdir_nohidden(self.quarterFinalsDir + match + '/draw/'):
+                         quarterMaps.append(matchDir + '/draw/' + rnd + '/generated.htm')
+                    else:
+                        quarterMaps.append(matchDir + '/' + rnd + '/generated.htm')
             self.quarterFinalsMaps.append(quarterMaps)
             self.quarterFinalsPlayers.append(list(quarterPlayers))
         print self.quarterFinalsPlayers
@@ -524,11 +525,10 @@ class DisplayCompetition(object):
             semiMaps = []
             for rnd in listdir_nohidden(self.semiFinalsDir + match):
                 if not rnd.endswith('.txt') and rnd != 'draw':
-                    semiMaps.append(matchDir + '/' + rnd + '/generated.htm')
-                if rnd == 'draw':
-                    for rnd2 in listdir_nohidden(self.semiFinalsDir + match + '/' + rnd):
-                        if not rnd2.endswith('.txt'):
-                            semiMaps.append(matchDir + '/' + rnd + '/' + rnd2 + '/generated.htm')
+                    if os.path.isdir(self.semiFinalsDir + match + '/draw/') and rnd in listdir_nohidden(self.semiFinalsDir + match + '/draw/'):
+                        semiMaps.append(matchDir + '/draw/' + rnd + '/generated.htm')
+                    else:
+                        semiMaps.append(matchDir + '/' + rnd + '/generated.htm')
             self.semiFinalsMaps.append(semiMaps)
             self.semiFinalsPlayers.append(list(semiPlayers))
         print self.semiFinalsMaps
