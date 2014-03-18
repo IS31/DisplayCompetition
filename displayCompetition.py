@@ -27,7 +27,7 @@ class DisplayCompetition(object):
     quarterFinalsRound = 1
     semiFinalsRound = 2
     finalRound = 4
-    numberOfLeagues = 0
+    numberOfLeagues = 4
     gamesPerMatch = 10
 
     players2Bots = {}
@@ -55,7 +55,7 @@ class DisplayCompetition(object):
         self.initPlayers2Bots()
         
         self.doLeagues()
-        #self.initScoreRounds()
+        self.initScoreRounds()
         self.generateLeaguesCover()
         self.generateLeaguesDisplay()
         self.resetScores()
@@ -71,7 +71,7 @@ class DisplayCompetition(object):
         self.initScoreFinal()
         self.generateFinalCover()
         self.generateFinalDisplay()
-        self.generateChampionDisplay()
+        # self.generateChampionDisplay()
 
     def initPlayers2Bots(self):
         for d in listdir_nohidden(self.submissionsDir):
@@ -92,14 +92,11 @@ class DisplayCompetition(object):
                 if maxSizeRoundFile:
                     self.leaguesMaps.append(matchDir + '/' + maxSizeRoundFile +  '/generated.htm')
             self.leaguesPlayers.append(list(leaguePlayers))
-            #print self.leaguesMaps
-        #print len(self.leaguesMaps)
-        print self.leaguesPlayers
 
-    # def initScoreRounds(self):
-    #     for league in self.leaguesPlayers:
-    #         for player in league:
-    #             self.scores[player] = 0
+    def initScoreRounds(self):
+        for league in self.leaguesPlayers:
+            for player in league:
+                self.scores[player] = 0
 
     def initScoreFinal(self):
         self.finalScores['0'] = 0
@@ -137,7 +134,6 @@ class DisplayCompetition(object):
             matchLooser = playerA
         else:
             print "Draw game!"
-            print matchDir
             matchWinner = playerA
             matchLooser = playerB
             self.drawFlag = True
@@ -172,16 +168,17 @@ class DisplayCompetition(object):
         if len(wonRoundFiles) == 0:
             self.fakeFlag = True
             wonRoundFiles = [rnd.split('.')[0] for rnd in listdir_nohidden(matchDir) if rnd.split('_')[0] == 'w' + matchWinner]
+        # Probably all draws, select random map
+        if len(wonRoundFiles) == 0:
+            wonRoundFiles = [rnd for rnd in listdir_nohidden(matchDir) if rnd.split('.')[-1] != 'txt']
         randomPointer = randint(0,len(wonRoundFiles)-1)
         selectedMap = wonRoundFiles[randomPointer]
         if self.drawFlag:
             self.drawMaps.append(matchDir + '/' + selectedMap + '/generated.htm')
             self.drawFlag = False
-            print self.drawMaps
         if self.fakeFlag:
             self.fakeMaps.append(selectedMap)
             self.fakeFlag = False
-            print self.fakeMaps
         return selectedMap
 
 
@@ -197,7 +194,6 @@ class DisplayCompetition(object):
         m = len(self.leaguesPlayers[1]) - 1 if self.numberOfLeagues > 0 else 0
         maxMatchesLargestLeague = (n * (n + 1))/2
         maxMatchesRegularLeagues = (m * (m + 1))/2
-        print maxMatchesLargestLeague
         for x in range(maxMatchesLargestLeague):
             htmlLeagueDisplayFile = open('leagueDisplay' + str(x) + '.html', 'w')
             fileContents = """
@@ -215,11 +211,12 @@ class DisplayCompetition(object):
     <div class="next"><a href='resultsDisplay""" + str(x) + """.html'><img src="imgs/next.png" height="16px" width="16px"></img></a></div>
     <iframe src='""" + self.leaguesMaps[x + 0] + """' height=1000 width=900 frameborder=0></iframe>
 """
+            print self.leaguesMaps
             if x < maxMatchesRegularLeagues:
                 fileContents += """
-    <iframe src='""" + self.leaguesMaps[x + 15] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 25] + """' height=1000 width=900 frameborder=0></iframe>
-    <iframe src='""" + self.leaguesMaps[x + 35] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 6] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 12] + """' height=1000 width=900 frameborder=0></iframe>
+    <iframe src='""" + self.leaguesMaps[x + 18] + """' height=1000 width=900 frameborder=0></iframe>
 """
             fileContents += """
   </body>
@@ -230,9 +227,9 @@ class DisplayCompetition(object):
             
             winner1 = self.leaguesMaps[x].split('/')[-2].split('_')[0][1:]
             if x < maxMatchesRegularLeagues:
-                winner2 = self.leaguesMaps[x+15].split('/')[-2].split('_')[0][1:]
-                winner3 = self.leaguesMaps[x+25].split('/')[-2].split('_')[0][1:]
-                winner4 = self.leaguesMaps[x+35].split('/')[-2].split('_')[0][1:]
+                winner2 = self.leaguesMaps[x+6].split('/')[-2].split('_')[0][1:]
+                winner3 = self.leaguesMaps[x+12].split('/')[-2].split('_')[0][1:]
+                winner4 = self.leaguesMaps[x+18].split('/')[-2].split('_')[0][1:]
 
             if self.leaguesMaps[x] not in self.drawMaps:
                 self.scores[winner1] += 3
@@ -241,26 +238,26 @@ class DisplayCompetition(object):
                 otherPlayer = self.leaguesMaps[x].split('/')[-2].split('_')[1].split('-')[1]
                 self.scores[onePlayer] += 1
                 self.scores[otherPlayer] += 1
-            if self.leaguesMaps[x+15] not in self.drawMaps:
+            if self.leaguesMaps[x+6] not in self.drawMaps:
                 self.scores[winner2] += 3
             else:
-                onePlayer = self.leaguesMaps[x+15].split('/')[-2].split('_')[1].split('-')[0]
-                otherPlayer = self.leaguesMaps[x+15].split('/')[-2].split('_')[1].split('-')[1]
+                onePlayer = self.leaguesMaps[x+6].split('/')[-2].split('_')[1].split('-')[0]
+                otherPlayer = self.leaguesMaps[x+6].split('/')[-2].split('_')[1].split('-')[1]
                 self.scores[onePlayer] += 1
                 self.scores[otherPlayer] += 1
-            if self.leaguesMaps[x+25] not in self.drawMaps:
+            if self.leaguesMaps[x+12] not in self.drawMaps:
                 self.scores[winner3] += 3
             else:
-                onePlayer = self.leaguesMaps[x+25].split('/')[-2].split('_')[1].split('-')[0]
-                otherPlayer = self.leaguesMaps[x+25].split('/')[-2].split('_')[1].split('-')[1]
+                onePlayer = self.leaguesMaps[x+12].split('/')[-2].split('_')[1].split('-')[0]
+                otherPlayer = self.leaguesMaps[x+12].split('/')[-2].split('_')[1].split('-')[1]
                 self.scores[onePlayer] += 1
                 self.scores[otherPlayer] += 1
             if x < 10:
-                if self.leaguesMaps[x+35] not in self.drawMaps:
+                if self.leaguesMaps[x+18] not in self.drawMaps:
                     self.scores[winner4] += 3
                 else:
-                    onePlayer = self.leaguesMaps[x+35].split('/')[-2].split('_')[1].split('-')[0]
-                    otherPlayer = self.leaguesMaps[x+35].split('/')[-2].split('_')[1].split('-')[1]
+                    onePlayer = self.leaguesMaps[x+18].split('/')[-2].split('_')[1].split('-')[0]
+                    otherPlayer = self.leaguesMaps[x+18].split('/')[-2].split('_')[1].split('-')[1]
                     self.scores[onePlayer] += 1
                     self.scores[otherPlayer] += 1
             htmlResultsDisplayFile = open('resultsDisplay' + str(x) + '.html', 'w')
