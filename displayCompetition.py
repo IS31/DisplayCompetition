@@ -17,6 +17,12 @@ class RoundDisplayHTMLParser(HTMLParser):
     def handle_data(self, data):
         print "Encountered some data  :", data
 
+#checks if the directory exist if not make them  
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
+
 class DisplayCompetition(object):
     submissionsDir = 'submissions/'
     tournamentResultsDir = 'tournamentResults/'
@@ -24,6 +30,14 @@ class DisplayCompetition(object):
     quarterFinalsDir = tournamentResultsDir + '1/'
     semiFinalsDir = tournamentResultsDir + '2/'
     finalDir = tournamentResultsDir + '3/'
+
+    ensure_dir(submissionsDir)
+    ensure_dir(tournamentResultsDir)
+    ensure_dir(leaguesDir)
+    ensure_dir(quarterFinalsDir)
+    ensure_dir(semiFinalsDir)
+    ensure_dir(finalDir)
+
     quarterFinalsRound = 1
     semiFinalsRound = 2
     finalRound = 4
@@ -53,7 +67,6 @@ class DisplayCompetition(object):
     
     def __init__(self):
         self.initPlayers2Bots()
-        
         self.doLeagues()
         self.initScoreRounds()
         self.generateLeaguesCover()
@@ -83,10 +96,17 @@ class DisplayCompetition(object):
     def doLeagues(self):
         for league in range(1, self.numberOfLeagues + 1):
             leaguePlayers = set()
+
+            
+            if not os.path.isdir(self.leaguesDir + str(league)):
+                os.makedirs(self.leaguesDir + str(league))
+
             for match in listdir_nohidden(self.leaguesDir + str(league)):
                 leaguePlayers.add(match.split('-')[0])
                 leaguePlayers.add(match.split('-')[1])
                 matchDir = self.leaguesDir + str(league) + '/' + match
+                if not os.path.isdir(matchDir):
+                    os.makedirs(matchDir)
                 matchWinner = self.getMatchWinner(matchDir)
                 maxSizeRoundFile = self.getMapToDisplay(matchDir, matchWinner)
                 if maxSizeRoundFile:
